@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Thumbnails
+Icon?
+
+# Spotlight
+.Spotlight-V100
+.Trashes
