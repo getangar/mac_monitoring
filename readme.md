@@ -1,5 +1,4 @@
-# Monitoring Configuration Guide
-## macOS Apple Silicon with Prometheus and Grafana
+# Monitoring Mac with Apple Silicon chips with Prometheus and Grafana
 
 This guide describes how to configure a complete monitoring system for Mac with Apple Silicon chips (M1/M2/M3/M4). The system uses Telegraf and mactop on the Mac to collect metrics, Prometheus on a Linux server for storage, and Grafana for visualization.
 
