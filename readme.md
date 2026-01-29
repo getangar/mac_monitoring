@@ -8,10 +8,12 @@ This guide describes how to configure a complete monitoring system for Mac with 
 
 | Component | Host | Port | Function |
 |-----------|------|------|----------|
-| Telegraf | Mac (192.168.50.227) | 9273 | System metrics (CPU, RAM, Disk, Network) |
-| mactop | Mac (192.168.50.227) | 9275 | Apple Silicon metrics (GPU, Power, Temp) |
-| Prometheus | Linux (192.168.50.130) | 9090 | Time-series database |
-| Grafana | Linux (192.168.50.130) | 3000 | Dashboard and visualization |
+| Telegraf | Mac (YOUR_MAC_IP) | 9273 | System metrics (CPU, RAM, Disk, Network) |
+| mactop | Mac (YOUR_MAC_IP) | 9275 | Apple Silicon metrics (GPU, Power, Temp) |
+| Prometheus | Linux (YOUR_SERVER_IP) | 9090 | Time-series database |
+| Grafana | Linux (YOUR_SERVER_IP) | 3000 | Dashboard and visualization |
+
+> **Note:** Replace `YOUR_MAC_IP` and `YOUR_SERVER_IP` with your actual IP addresses (e.g., 192.168.1.100 and 192.168.1.200)
 
 ---
 
@@ -62,13 +64,13 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'mac-mini-telegraf'
+  - job_name: 'mac-telegraf'
     static_configs:
-      - targets: ['192.168.50.227:9273']
+      - targets: ['YOUR_MAC_IP:9273']
 
-  - job_name: 'mac-mini-mactop'
+  - job_name: 'mac-mactop'
     static_configs:
-      - targets: ['192.168.50.227:9275']
+      - targets: ['YOUR_MAC_IP:9275']
 ```
 
 ### 1.4 Systemd Service for Prometheus
@@ -123,7 +125,7 @@ sudo systemctl enable grafana-server
 sudo systemctl start grafana-server
 ```
 
-> **Note:** Grafana will be accessible at http://SERVER_IP:3000 (default credentials: admin/admin)
+> **Note:** Grafana will be accessible at http://YOUR_SERVER_IP:3000 (default credentials: admin/admin)
 
 ---
 
@@ -162,7 +164,7 @@ Create/edit the file `/opt/homebrew/etc/telegraf.conf`:
   flush_interval = "10s"
   flush_jitter = "0s"
   precision = ""
-  hostname = "macmini"
+  hostname = ""  # Leave empty to use system hostname, or set your preferred name
   omit_hostname = false
 
 # Prometheus output
@@ -191,15 +193,6 @@ Create/edit the file `/opt/homebrew/etc/telegraf.conf`:
 [[inputs.swap]]
 
 [[inputs.system]]
-
-# macOS CPU frequency
-[[inputs.exec]]
-  commands = ["/bin/bash -c \"echo freq,cpu,frequency && for i in $(seq 0 9); do echo freq,cpu$i,$(sudo powermetrics -n 1 -i 100 --samplers cpu_power 2>/dev/null | grep -E \"CPU $i\" | awk '{print $NF}' | tr -d 'MHz'); done\""]
-  timeout = "5s"
-  data_format = "csv"
-  csv_header_row_count = 1
-  csv_measurement_column = "measurement"
-  csv_tag_columns = ["cpu"]
 
 # SMART disk health
 [[inputs.smart]]
@@ -284,13 +277,13 @@ screen -r mactop
 
 ```bash
 # Test Telegraf
-curl http://192.168.50.227:9273/metrics
+curl http://YOUR_MAC_IP:9273/metrics
 
 # Test mactop
-curl http://192.168.50.227:9275/metrics
+curl http://YOUR_MAC_IP:9275/metrics
 
 # Verify targets in Prometheus
-# Open http://192.168.50.130:9090/targets in browser
+# Open http://YOUR_SERVER_IP:9090/targets in browser
 ```
 
 ### 3.2 Available Metrics from mactop
@@ -321,7 +314,7 @@ curl http://192.168.50.227:9275/metrics
 
 ### 4.2 Importing Dashboard
 
-The dashboard JSON file (`macos-apple-silicon-dashboard-v6.json`) can be imported:
+The dashboard JSON file (`macos-apple-silicon-dashboard.json`) can be imported:
 
 1. Go to Dashboards > New > Import
 2. Upload the JSON file or paste the content
@@ -444,4 +437,10 @@ sudo cp /etc/prometheus/prometheus.yml ~/backup/
 
 ---
 
-*Guide generated on January 29, 2026 - Configuration tested on Mac mini M4 with macOS*
+## License
+
+MIT
+
+---
+
+*Configuration tested on Mac mini M4 with macOS*
