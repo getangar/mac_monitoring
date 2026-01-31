@@ -443,4 +443,4 @@ MIT
 
 ---
 
-*Configuration tested on Mac mini M4 with macOS*
+*Configuration tested on Mac mini M4 Pro with macOS 26 Tahoe
